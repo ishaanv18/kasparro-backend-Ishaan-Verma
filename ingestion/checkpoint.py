@@ -138,16 +138,18 @@ class CheckpointManager:
             Datetime of last checkpoint or None
         """
         checkpoint = self.get_checkpoint()
-        if checkpoint and checkpoint["type"] == "timestamp":
-            try:
-                return datetime.fromisoformat(checkpoint["value"].replace("Z", "+00:00"))
-            except Exception as e:
-                logger.error(
-                    "Failed to parse timestamp checkpoint",
-                    source=self.source_name,
-                    value=checkpoint["value"],
-                    error=str(e)
-                )
+        if checkpoint:
+            metadata = checkpoint.get("metadata", {})
+            if metadata.get("type") == "timestamp":
+                try:
+                    return datetime.fromisoformat(checkpoint["checkpoint_value"].replace("Z", "+00:00"))
+                except Exception as e:
+                    logger.error(
+                        "Failed to parse timestamp checkpoint",
+                        source=self.source_name,
+                        value=checkpoint["checkpoint_value"],
+                        error=str(e)
+                    )
         return None
     
     def get_last_row_number(self) -> int:
@@ -158,14 +160,17 @@ class CheckpointManager:
             Last processed row number or 0
         """
         checkpoint = self.get_checkpoint()
-        if checkpoint and checkpoint["type"] == "row_number":
-            try:
-                return int(checkpoint["value"])
-            except Exception as e:
-                logger.error(
-                    "Failed to parse row number checkpoint",
-                    source=self.source_name,
-                    value=checkpoint["value"],
-                    error=str(e)
-                )
+        if checkpoint:
+            metadata = checkpoint.get("metadata", {})
+            if metadata.get("type") == "row_number":
+                try:
+                    return int(checkpoint["checkpoint_value"])
+                except Exception as e:
+                    logger.error(
+                        "Failed to parse row number checkpoint",
+                        source=self.source_name,
+                        value=checkpoint["checkpoint_value"],
+                        error=str(e)
+                    )
         return 0
+
