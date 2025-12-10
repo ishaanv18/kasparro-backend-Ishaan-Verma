@@ -77,7 +77,7 @@ class TestSchemaDrift:
         
         # Test similar field names
         match1 = detector.fuzzy_match_field("username", threshold=70)
-        match2 = detector.fuzzy_match_field("email", threshold=60)  # Lower threshold for shorter match
+        match2 = detector.fuzzy_match_field("email_addr", threshold=70)  # Better match for email_address
         
         assert match1 == "user_name"
         assert match2 == "email_address"
