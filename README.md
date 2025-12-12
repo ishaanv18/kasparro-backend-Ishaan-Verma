@@ -53,7 +53,7 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
 
 ## Live Deployment
 
-**Production URL**: https://kasparro-api.onrender.com (deployment in progress)
+**Production URL**: https://kasparro-backend-ishaan-verma.onrender.com
 
 > [!NOTE]
 > The application is deployed on Render.com's free tier. Initial requests may take 30-60 seconds as the service spins up from sleep mode.
@@ -62,13 +62,13 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
 
 ```bash
 # Check health endpoint
-curl https://kasparro-api.onrender.com/health
+curl https://kasparro-backend-ishaan-verma.onrender.com/health
 
 # View API documentation
-open https://kasparro-api.onrender.com/docs
+open https://kasparro-backend-ishaan-verma.onrender.com/docs
 
 # Query cryptocurrency data
-curl "https://kasparro-api.onrender.com/data?symbol=BTC"
+curl "https://kasparro-backend-ishaan-verma.onrender.com/data?symbol=BTC"
 ```
 
 ## Quick Start
