@@ -106,8 +106,14 @@ jobs:
         docker build -t kasparro-backend:latest .
     
     - name: Test Docker Image
+      env:
+        DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/test_db
+        DATABASE_URL_SYNC: postgresql://test:test@localhost:5432/test_db
       run: |
-        docker run --rm kasparro-backend:latest python -c "import api.main; print('Image OK')"
+        docker run --rm \
+          -e DATABASE_URL="$DATABASE_URL" \
+          -e DATABASE_URL_SYNC="$DATABASE_URL_SYNC" \
+          kasparro-backend:latest python -c "import api.main; print('Image OK')"
 
   publish:
     name: Publish Docker Image
