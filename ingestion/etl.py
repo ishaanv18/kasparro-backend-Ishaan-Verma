@@ -112,17 +112,18 @@ class ETLOrchestrator:
                             conn.execute(
                                 text("""
                                     INSERT INTO normalized_crypto_data (
-                                        source, source_id, symbol, name,
+                                        source, source_id, master_coin_id, symbol, name,
                                         price_usd, market_cap_usd, volume_24h_usd,
                                         rank, circulating_supply, total_supply, max_supply,
                                         percent_change_24h, additional_data, data_timestamp
                                     ) VALUES (
-                                        :source, :source_id, :symbol, :name,
+                                        :source, :source_id, :master_coin_id, :symbol, :name,
                                         :price_usd, :market_cap_usd, :volume_24h_usd,
                                         :rank, :circulating_supply, :total_supply, :max_supply,
                                         :percent_change_24h, :additional_data, :data_timestamp
                                     )
                                     ON CONFLICT (source, source_id, data_timestamp) DO UPDATE SET
+                                        master_coin_id = EXCLUDED.master_coin_id,
                                         price_usd = EXCLUDED.price_usd,
                                         market_cap_usd = EXCLUDED.market_cap_usd,
                                         volume_24h_usd = EXCLUDED.volume_24h_usd
@@ -130,6 +131,7 @@ class ETLOrchestrator:
                                 {
                                     "source": normalized["source"],
                                     "source_id": normalized["source_id"],
+                                    "master_coin_id": normalized.get("master_coin_id"),
                                     "symbol": normalized["symbol"],
                                     "name": normalized["name"],
                                     "price_usd": normalized.get("price_usd"),

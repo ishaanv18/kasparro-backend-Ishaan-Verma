@@ -4,17 +4,19 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: kasparro-postgres
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: kasparro
-      POSTGRES_PASSWORD: kasparro123
-      POSTGRES_DB: kasparro_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U kasparro" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,8 +32,8 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://kasparro:kasparro123@postgres:5432/kasparro_db
-      - DATABASE_URL_SYNC=postgresql://kasparro:kasparro123@postgres:5432/kasparro_db
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL_SYNC=${DATABASE_URL_SYNC}
     volumes:
       - .:/app
       - ./data:/app/data
@@ -49,8 +51,8 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://kasparro:kasparro123@postgres:5432/kasparro_db
-      - DATABASE_URL_SYNC=postgresql://kasparro:kasparro123@postgres:5432/kasparro_db
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL_SYNC=${DATABASE_URL_SYNC}
     volumes:
       - .:/app
       - ./data:/app/data

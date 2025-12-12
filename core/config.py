@@ -8,13 +8,16 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database
+    # NOTE: No defaults - these MUST be set via environment variables
     database_url: str = Field(
-        default="postgresql+asyncpg://kasparro:kasparro123@localhost:5432/kasparro_db",
-        alias="DATABASE_URL"
+        ...,
+        alias="DATABASE_URL",
+        description="Async database URL (must be set via environment variable)"
     )
     database_url_sync: str = Field(
-        default="postgresql://kasparro:kasparro123@localhost:5432/kasparro_db",
-        alias="DATABASE_URL_SYNC"
+        ...,
+        alias="DATABASE_URL_SYNC",
+        description="Sync database URL (must be set via environment variable)"
     )
     
     # API Keys

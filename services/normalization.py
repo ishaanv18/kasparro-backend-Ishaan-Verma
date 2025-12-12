@@ -3,6 +3,7 @@ from typing import Dict, Any
 from datetime import datetime
 from decimal import Decimal
 from schemas.normalized import NormalizedCryptoData
+from services.entity_resolution import EntityResolutionService
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -15,6 +16,19 @@ class NormalizationService:
     def normalize_coinpaprika(raw_data: Dict[str, Any], data_timestamp: datetime) -> NormalizedCryptoData:
         """Normalize CoinPaprika data to unified schema."""
         try:
+            # Extract basic info
+            source_id = raw_data.get("coin_id") or raw_data.get("id", "")
+            symbol = raw_data.get("symbol", "").upper()
+            name = raw_data.get("name", "")
+            
+            # Resolve entity to master coin
+            master_coin_id = EntityResolutionService.resolve_entity(
+                source="coinpaprika",
+                source_id=source_id,
+                symbol=symbol,
+                name=name
+            )
+            
             # Extract price from nested quotes structure if present
             # NOTE: CoinPaprika changed their API structure, had to handle both formats
             price_usd = raw_data.get("price_usd")
@@ -34,9 +48,10 @@ class NormalizationService:
             
             return NormalizedCryptoData(
                 source="coinpaprika",
-                source_id=raw_data.get("coin_id") or raw_data.get("id", ""),
-                symbol=raw_data.get("symbol", "").upper(),
-                name=raw_data.get("name", ""),
+                source_id=source_id,
+                master_coin_id=master_coin_id,
+                symbol=symbol,
+                name=name,
                 price_usd=Decimal(str(price_usd)) if price_usd else None,
                 market_cap_usd=Decimal(str(market_cap)) if market_cap else None,
                 volume_24h_usd=Decimal(str(volume_24h)) if volume_24h else None,
@@ -59,11 +74,25 @@ class NormalizationService:
     def normalize_coingecko(raw_data: Dict[str, Any], data_timestamp: datetime) -> NormalizedCryptoData:
         """Normalize CoinGecko data to unified schema."""
         try:
+            # Extract basic info
+            source_id = raw_data.get("coin_id") or raw_data.get("id", "")
+            symbol = raw_data.get("symbol", "").upper()
+            name = raw_data.get("name", "")
+            
+            # Resolve entity to master coin
+            master_coin_id = EntityResolutionService.resolve_entity(
+                source="coingecko",
+                source_id=source_id,
+                symbol=symbol,
+                name=name
+            )
+            
             return NormalizedCryptoData(
                 source="coingecko",
-                source_id=raw_data.get("coin_id") or raw_data.get("id", ""),
-                symbol=raw_data.get("symbol", "").upper(),
-                name=raw_data.get("name", ""),
+                source_id=source_id,
+                master_coin_id=master_coin_id,
+                symbol=symbol,
+                name=name,
                 price_usd=Decimal(str(raw_data["current_price"])) if raw_data.get("current_price") else None,
                 market_cap_usd=Decimal(str(raw_data["market_cap"])) if raw_data.get("market_cap") else None,
                 volume_24h_usd=Decimal(str(raw_data["total_volume"])) if raw_data.get("total_volume") else None,
@@ -92,12 +121,22 @@ class NormalizationService:
             # Generate a source_id from symbol for CSV data
             symbol = raw_data.get("symbol", "").upper()
             source_id = f"csv_{symbol}"
+            name = raw_data.get("name", "")
+            
+            # Resolve entity to master coin
+            master_coin_id = EntityResolutionService.resolve_entity(
+                source="csv",
+                source_id=source_id,
+                symbol=symbol,
+                name=name
+            )
             
             return NormalizedCryptoData(
                 source="csv",
                 source_id=source_id,
+                master_coin_id=master_coin_id,
                 symbol=symbol,
-                name=raw_data.get("name", ""),
+                name=name,
                 price_usd=Decimal(str(raw_data["price_usd"])) if raw_data.get("price_usd") else None,
                 market_cap_usd=Decimal(str(raw_data["market_cap_usd"])) if raw_data.get("market_cap_usd") else None,
                 volume_24h_usd=Decimal(str(raw_data["volume_24h_usd"])) if raw_data.get("volume_24h_usd") else None,

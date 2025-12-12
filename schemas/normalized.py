@@ -10,6 +10,7 @@ class NormalizedCryptoData(BaseModel):
     
     source: str = Field(..., description="Data source: coinpaprika, coingecko, csv")
     source_id: str = Field(..., description="Unique identifier from source")
+    master_coin_id: Optional[int] = Field(None, description="Master coin entity ID for cross-source unification")
     symbol: str = Field(..., description="Cryptocurrency symbol (e.g., BTC)")
     name: str = Field(..., description="Full name of cryptocurrency")
     price_usd: Optional[Decimal] = Field(None, description="Current price in USD")

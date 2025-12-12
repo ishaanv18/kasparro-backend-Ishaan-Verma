@@ -48,6 +48,28 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
 - **normalized_crypto_data**: Unified normalized data
 - **etl_checkpoints**: Incremental ingestion tracking
 - **etl_runs**: ETL execution metadata
+- **master_coins**: Canonical cryptocurrency entities for cross-source unification
+- **coin_source_mappings**: Maps source-specific IDs to master coin entities
+
+## Live Deployment
+
+**Production URL**: https://kasparro-api.onrender.com (deployment in progress)
+
+> [!NOTE]
+> The application is deployed on Render.com's free tier. Initial requests may take 30-60 seconds as the service spins up from sleep mode.
+
+### Quick Verification
+
+```bash
+# Check health endpoint
+curl https://kasparro-api.onrender.com/health
+
+# View API documentation
+open https://kasparro-api.onrender.com/docs
+
+# Query cryptocurrency data
+curl "https://kasparro-api.onrender.com/data?symbol=BTC"
+```
 
 ## Quick Start
 
@@ -63,10 +85,14 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
    cp .env.example .env
    ```
 
-2. **Add API keys** (optional - system works without them)
+2. **Configure environment variables**
    
-   Edit `.env` and add:
+   Edit `.env` and set required values:
    ```env
+   # Required: Set a secure password
+   POSTGRES_PASSWORD=your_secure_password_here
+   
+   # Optional: Add API keys
    COINGECKO_API_KEY=your_key_here
    COINPAPRIKA_API_KEY=  # Leave empty to use public API
    ```
@@ -76,7 +102,7 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
    docker compose up -d --build
    ```
 
-4. **Verify deployment**
+4. **Verify local deployment**
    ```bash
    # Check health
    curl http://localhost:8000/health
@@ -191,6 +217,13 @@ Transforms heterogeneous schemas into unified format:
 - Type validation with Pydantic
 - Graceful handling of missing fields
 
+### Entity Resolution
+Unifies cryptocurrency data across sources:
+- **Master Coins Table**: Canonical entities for each cryptocurrency
+- **Fuzzy Matching**: Intelligent symbol and name matching across sources
+- **Cross-Source Unification**: Bitcoin from CoinPaprika, CoinGecko, and CSV map to single entity
+- **Automatic Discovery**: New coins are automatically added to master table
+
 ### Error Handling
 - Comprehensive exception handling
 - Checkpoint updates on failure
@@ -207,7 +240,42 @@ Transforms heterogeneous schemas into unified format:
 
 ## Deployment
 
-The system is containerized and ready for cloud deployment. See `docker-compose.yml` for service configuration.
+### Local Deployment
+
+The system is containerized and ready for local deployment. See `docker-compose.yml` for service configuration.
+
+### Cloud Deployment (Render.com)
+
+This application is configured for deployment on Render.com:
+
+1. **Push to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Prepare for deployment"
+   git push origin main
+   ```
+
+2. **Deploy on Render**:
+   - Go to [Render.com](https://render.com) and sign in
+   - Click "New +" → "Blueprint"
+   - Connect your GitHub repository
+   - Render will automatically detect `render.yaml` and create:
+     - PostgreSQL database
+     - Web service (FastAPI)
+     - Background worker (ETL)
+
+3. **Set Environment Variables**:
+   - In Render dashboard, set:
+     - `COINGECKO_API_KEY` (optional)
+     - `COINPAPRIKA_API_KEY` (optional)
+   - Database credentials are automatically configured
+
+4. **Run Database Migration**:
+   - After deployment, access the web service shell
+   - Run: `psql $DATABASE_URL < migrations/init.sql`
+   - Run: `psql $DATABASE_URL < migrations/add_master_coins.sql`
+
+The application will be available at `https://your-app-name.onrender.com`
 
 ## License
 
