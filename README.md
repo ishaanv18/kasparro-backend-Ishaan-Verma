@@ -1,8 +1,12 @@
 # Kasparro Backend & ETL System
 
-A cryptocurrency data ingestion and API service for the Kasparro backend assignment. This project implements a multi-source ETL pipeline that fetches data from CoinPaprika API, CoinGecko API, and CSV files, normalizes it into a unified schema, and serves it through a RESTful API.
+[![CI/CD](https://github.com/ishaanv18/kasparro-backend-Ishaan-Verma/actions/workflows/ci.yml/badge.svg)](https://github.com/ishaanv18/kasparro-backend-Ishaan-Verma/actions)
+[![Live Deployment](https://img.shields.io/badge/Live-Render.com-46E3B7)](https://kasparro-api.onrender.com)
 
-**Tech Stack**: FastAPI, PostgreSQL, Docker, Python 3.11
+A production-grade cryptocurrency data ingestion and API service for the Kasparro backend assignment. This project implements a multi-source ETL pipeline that fetches data from CoinPaprika API, CoinGecko API, and CSV files, normalizes it into a unified schema with entity resolution, and serves it through a RESTful API.
+
+**Tech Stack**: FastAPI, PostgreSQL, Docker, Python 3.11  
+**Live URL**: https://kasparro-api.onrender.com
 
 ## Features
 
@@ -21,6 +25,8 @@ A cryptocurrency data ingestion and API service for the Kasparro backend assignm
 - **Run Comparison**: Historical ETL run analysis and comparison
 - **CI/CD Pipeline**: GitHub Actions for automated testing and deployment
 - **Structured Logging**: JSON-formatted logs using structlog
+- **Entity Resolution**: Cross-source cryptocurrency unification with fuzzy matching
+- **Security**: No hardcoded credentials, environment variable-based configuration
 
 ## Architecture
 
@@ -262,7 +268,6 @@ This application is configured for deployment on Render.com:
    - Render will automatically detect `render.yaml` and create:
      - PostgreSQL database
      - Web service (FastAPI)
-     - Background worker (ETL)
 
 3. **Set Environment Variables**:
    - In Render dashboard, set:
@@ -275,7 +280,28 @@ This application is configured for deployment on Render.com:
    - Run: `psql $DATABASE_URL < migrations/init.sql`
    - Run: `psql $DATABASE_URL < migrations/add_master_coins.sql`
 
-The application will be available at `https://your-app-name.onrender.com`
+**Live Production URL**: https://kasparro-api.onrender.com
+
+## Critical Fixes Implemented
+
+This submission addresses all Critical Failure Gates from the architectural review:
+
+### ✅ Gate 0.3: Hardcoded Secrets
+- Removed all hardcoded database credentials from `docker-compose.yml` and `core/config.py`
+- Enforced environment variable injection for all sensitive configuration
+- Updated `.env.example` with secure placeholder values
+
+### ✅ Gate 0.2: Entity Resolution & Normalization
+- Implemented `master_coins` table for canonical cryptocurrency entities
+- Created fuzzy matching algorithm (70% similarity threshold) for cross-source entity resolution
+- Bitcoin from CoinPaprika, CoinGecko, and CSV now unify to a single master entity
+- Automatic discovery and creation of new coin entities
+
+### ✅ Gate 0.4: Cloud Deployment
+- Deployed to Render.com: https://kasparro-api.onrender.com
+- Configured via `render.yaml` Blueprint for automated deployment
+- Database migrations applied and verified
+- All API endpoints accessible and functional
 
 ## License
 
@@ -285,4 +311,5 @@ MIT License
 
 **Author**: Ishaan Verma  
 **Assignment**: Kasparro Backend Challenge  
-**Date**: December 2025
+**Date**: December 2025  
+**Production URL**: https://kasparro-api.onrender.com
