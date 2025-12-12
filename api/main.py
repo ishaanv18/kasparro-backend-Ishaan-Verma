@@ -94,13 +94,14 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # Import and register routes
-from api.routes import data, health, stats, metrics, runs
+from api.routes import data, health, stats, metrics, runs, admin
 
 app.include_router(data.router, tags=["Data"])
 app.include_router(health.router, tags=["Health"])
 app.include_router(stats.router, tags=["Statistics"])
 app.include_router(metrics.router, tags=["Metrics"])
 app.include_router(runs.router, tags=["Runs & Anomalies"])
+app.include_router(admin.router, tags=["Admin"])
 
 
 @app.get("/")
