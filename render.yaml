@@ -1,14 +1,12 @@
-services:
+databases:
   # PostgreSQL Database
-  - type: pserv
-    name: kasparro-postgres
-    env: docker
+  - name: kasparro-postgres
+    databaseName: kasparro_db
+    user: kasparro
     plan: free
     region: oregon
-    databases:
-      - name: kasparro_db
-        user: kasparro
-    
+
+services:
   # FastAPI Web Service
   - type: web
     name: kasparro-api
